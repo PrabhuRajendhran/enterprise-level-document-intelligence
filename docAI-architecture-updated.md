@@ -167,36 +167,36 @@ The system splits into two paths after the router to handle both specific data e
 
 ```mermaid
 graph TD
-    A[User Uploads PDF] --> B{Smart Router};
+    A["User Uploads PDF"] --> B{"Smart Router"};
     
-    B -->|Digital & Clean| C[Tier 1: pymupdf4llm];
-    B -->|Scanned & Simple| D[Tier 2: Standard OCR];
-    B -->|Complex Layout| E[Tier 3: Layout-Aware Model];
-    B -->|Messy/Handwritten| F[Tier 4: VLM (Qwen/Claude)];
+    B -->|"Digital & Clean"| C["Tier 1: pymupdf4llm"];
+    B -->|"Scanned & Simple"| D["Tier 2: Standard OCR"];
+    B -->|"Complex Layout"| E["Tier 3: Layout-Aware Model"];
+    B -->|"Messy/Handwritten"| F["Tier 4: VLM (Qwen/Claude)"];
     
-    C --> G[Markdown Output];
+    C --> G["Markdown Output"];
     D --> G;
     E --> G;
     F --> G;
     
-    G --> H{Purpose?};
+    G --> H{"Purpose?"};
     
-    H -->|Structured Data| I[Extraction Path];
-    I --> J[LLM Extraction to JSON];
-    J --> K[(PostgreSQL)];
+    H -->|"Structured Data"| I["Extraction Path"];
+    I --> J["LLM Extraction to JSON"];
+    J --> K[("PostgreSQL")];
     
-    H -->|Chat/Q&A| L[Chat Path];
-    L --> M[Chunking & Embedding];
-    K -->|Sync Metadata| M;
-    M --> N[(Vector DB)];
+    H -->|"Chat/Q&A"| L["Chat Path"];
+    L --> M["Chunking & Embedding"];
+    K -->|"Sync Metadata"| M;
+    M --> N[("Vector DB")];
     
-    User[User Query] --> O{Hybrid Search};
-    O -->|Keywords| N;
-    O -->|Vectors| N;
-    O -->|Filters| N;
+    User["User Query"] --> O{"Hybrid Search"};
+    O -->|"Keywords"| N;
+    O -->|"Vectors"| N;
+    O -->|"Filters"| N;
     
-    N --> P[Reranker];
-    P --> Q[LLM Response];
+    N --> P["Reranker"];
+    P --> Q["LLM Response"];
 ```
 
 -----
