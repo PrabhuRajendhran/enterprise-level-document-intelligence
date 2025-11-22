@@ -166,3 +166,63 @@ def process_document(file):
 4.  **GraphRAG:** Added to enable complex, multi-document reasoning in the chat layer.
 
 This outline covers every base, from the simplest PDF to the most complex, unreadable, logic-heavy financial document.
+
+***
+
+# 📄 Project Titan-IDP: The Universal Document Engine
+**Mission:** A unified, cost-efficient system to ingest **any** file type, auto-discover its structure, extract validated data, and enable high-fidelity "Chat with your Docs."
+
+### 🛑 The Problem
+Traditional OCR pipelines are brittle. They fail on handwriting, lose table structures, cost too much for simple docs, and hallucinate answers during chat.
+### ✅ The Solution
+A **"Fail-Up" Architecture**. We start with fast, free tools for simple docs and automatically escalate to advanced AI (VLMs) only when necessary. This guarantees **100% data coverage at the lowest possible cost.**
+
+---
+
+## 🏗️ The 4-Phase Architecture
+
+### 🔷 Phase 1: Smart Ingestion & Discovery (The Router)
+* **Goal:** Handle any input (Email, Zip, PDF) and figure out *what* it is.
+* **Key Innovation:** **Auto-Schema Discovery**. An AI agent scans Page 1 to write its own extraction rules (e.g., "This is a Medical Record, I need to extract Patient ID").
+* **Tech:** `libratom` (Unpacker), `GPT-4o` (Discovery Agent).
+
+### 🔷 Phase 2: The Processing Core (From Pixels to Data)
+* **Strategy:** Use the cheapest tool that works.
+    * **Tier 1 (Digital Native):** `Docling` / `MarkItDown`. Reads internal code of Word/PDFs. **(Speed: <1s, Cost: $0)**.
+    * **Tier 2 (Standard OCR):** `OCRmyPDF`. For clean scans. **(Speed: Fast, Cost: Low)**.
+    * **Tier 3 (Forms/Tables):** `Mistral-OCR`. Preserves complex table grids. **(Best for Invoices)**.
+    * **Tier 4 (The "Nuclear" Option):** `GPT-4o` / `Gemini 1.5`. Handles handwriting, messy notes, and multi-page logic. **(Highest Accuracy)**.
+
+### 🔷 Phase 3: The Semantic Layer (Extraction & Logic)
+* **Goal:** Convert raw text into trusted JSON data.
+* **Capabilities:**
+    * **Spatial Extraction:** Knows that a date in the *top-right* is the "Invoice Date."
+    * **Logic Judge:** Auto-verifies data (e.g., "Does Subtotal + Tax = Total?").
+    * **Generic Discovery:** Can extract fields from documents it has never seen before.
+* **Tech:** `Instructor` (Pydantic), `DSPy` (Prompt Optimizer).
+
+### 🔷 Phase 4: Chat & Retrieval (The User Interface)
+* **Goal:** Answer user questions accurately without "hallucinations."
+* **Advanced RAG Stack:**
+    * **Late Chunking:** Keeps sentences whole for better context.
+    * **Hybrid Search:** Combines specific keywords (IDs) + semantic concepts ("Why failed?").
+    * **GraphRAG:** Connects dots across documents (e.g., "Match this Invoice to that Contract").
+* **Tech:** `Qdrant` (Vector DB), `Cohere Rerank`, `Gemini Pro` (Long Context).
+
+---
+
+## 🚀 Key Differentiators (Why This Wins)
+
+| Feature | Titan-IDP Approach | Traditional Approach |
+| :--- | :--- | :--- |
+| **Cost** | **Dynamic:** Uses free tools for 80% of docs. | **High:** Burns expensive GPU/API credits on everything. |
+| **Generality** | **Universal:** Auto-learns new document types. | **Brittle:** Fails on anything it wasn't hard-coded for. |
+| **Tables** | **Structure-Aware:** Understands rows & columns. | **Flat:** Reads tables as jumbled lines of text. |
+| **Chat** | **Reasoning:** Can answer "Why?" questions. | **Search:** Can only find keywords. |
+
+---
+
+### 🛠️ Execution Strategy
+1.  **Build Tier 1 & 4 First:** Covers the easiest (Digital) and hardest (Handwritten) cases immediately.
+2.  **Add Discovery Agent:** Removes the need to write manual templates.
+3.  **Deploy GraphRAG:** Enables complex cross-document reasoning for the Chatbot.
