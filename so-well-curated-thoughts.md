@@ -1,0 +1,168 @@
+# 🏗️ TITAN-IDP: Universal Document Intelligence Engine
+
+**Mission:** Ingest *any* file, discover its structure automatically, extract precise data, and enable reasoning-based chat.
+
+-----
+
+## 🔷 PHASE 1: INGESTION & DISCOVERY (The "Router")
+
+**Goal:** Receive a binary file, sanitize it, and figure out *what* it is and *how* to read it.
+
+### **TIER 0: THE UNPACKER (Recursive Sanitization)**
+
+  * **What it is:** A recursive script that opens container files (zips, emails) and extracts payload documents.
+  * **Why it matters:** 40% of business data is trapped inside email attachments (`.msg`, `.eml`) or compressed archives.
+  * **What fails if missing:** The system sees a `.zip` file as binary garbage and fails to process the invoices inside.
+  * **Tools:** `libratom` (PST/Email), `unstructured` (General).
+
+### **TIER 0.5: THE DISCOVERY AGENT (The "Generic" Enabler) 🆕**
+
+  * **What it is:** A VLM-based agent that scans the first page to **auto-generate a schema**.
+  * **Why it matters:** This makes your pipeline **Generic**. You don't need to hardcode "Invoice Fields." The agent sees a Medical Record and writes a "Medical Record Schema" on the fly.
+  * **Step-by-Step:**
+    1.  Send Page 1 to **GPT-4o** or **Qwen2.5-VL**.
+    2.  Prompt: *"Analyze this layout. List all distinct data fields (e.g., Dates, Totals, IDs). Output a JSON Schema representing this document."*
+    3.  Save this schema as `dynamic_schema.json` for the extraction phase.
+  * **What fails if missing:** You have to manually code templates for every new document type.
+
+-----
+
+## 🔷 PHASE 2: THE PROCESSING CORE (From Pixels to Markdown)
+
+**Goal:** Convert the visual document into a computer-readable Markdown format that preserves layout (tables, headers, checkboxes).
+
+### **TIER 1: DIGITAL NATIVE (High Speed)**
+
+  * **Target:** Born-digital PDFs, Word, Excel, HTML.
+  * **Model:** **Docling** (IBM) or **MarkItDown** (Microsoft).
+  * **Why it matters:** These tools access the internal code of the file. They don't "guess" characters; they read them.
+  * **What fails if missing:** You waste expensive GPU credits performing OCR on a file that text could be copied from. Tables lose their structure.
+
+### **TIER 2: STANDARD OCR (The Baseline)**
+
+  * **Target:** Clean scans, simple letters, contracts.
+  * **Model:** **OCRmyPDF** (Tesseract 5) or **Got-OCR2.0** (New generic OCR theory model).
+  * **Why it matters:** Cost efficiency. 80% of documents don't need AI; they just need optical recognition.
+  * **What fails if missing:** You overpay massively by using VLMs for simple text.
+
+### **TIER 3: LAYOUT-AWARE (The Form Specialist)**
+
+  * **Target:** Invoices, Forms, Receipts, Bank Statements.
+  * **Model:** **Mistral-OCR** (API) or **Surya** (Open Source).
+  * **Why it matters:** These models understand *grid systems*. They know that text aligned in columns belongs together.
+  * **Example:** Distinguishing between "Billed To" and "Shipped To" columns.
+  * **What fails if missing:** Tables are read as flat text lines, mixing up data from different columns.
+
+### **TIER 4: VLM & LONG-CONTEXT (The "Nuclear" Option)**
+
+  * **Target:** Handwriting, Messy images, "Spatial" extraction (Left vs Right), Cross-page tables.
+  * **Models:**
+      * **Reasoning/Spatial:** **GPT-4o** or **Claude 3.5 Sonnet**.
+      * **Long Documents (50+ pages):** **Gemini 1.5 Pro**.
+  * **Why it matters:**
+      * *Spatial:* Resolves "Which date is this?" by looking at the pixels.
+      * *Long Context:* Gemini 1.5 Pro has a huge context window, allowing it to "stitch" a table that spans 10 pages without losing rows.
+  * **What fails if missing:** Handwriting is unreadable; Multi-page tables get broken; "Implied" fields are missed.
+
+-----
+
+## 🔷 PHASE 3: THE SEMANTIC LAYER (Extraction & Verification)
+
+**Goal:** Turn Markdown/Text into validated JSON Data using the schema from Tier 0.5.
+
+### **LAYER A: DSPy OPTIMIZER (The "Prompt Engineer") 🆕**
+
+  * **What it is:** Instead of writing static prompts, use **DSPy**. It is a framework that *compiles* and *optimizes* prompts based on data.
+  * **Why it matters:** It auto-tunes the extraction prompts for your specific documents, improving accuracy over time without code changes.
+
+### **LAYER B: SPATIAL EXTRACTION**
+
+  * **Model:** **Instructor** (Python wrapper) + **VLM**.
+  * **Step-by-Step:**
+    1.  Load `dynamic_schema.json` (from Tier 0.5).
+    2.  Pass image + Schema to VLM.
+    3.  Prompt: *"Extract fields matching this schema. Pay attention to spatial cues (e.g., 'Date' in top-right vs 'Date' in footer)."*
+  * **Example:** `{ "invoice_date": "2024-01-01", "print_date": "2024-01-05" }`.
+
+### **LAYER C: THE LOGIC JUDGE (Self-Correction)**
+
+  * **What it is:** A lightweight code-interpreter step.
+  * **Why it matters:** Hallucination check.
+  * **Action:**
+      * *Check:* Does `Sum(line_items)` == `Total_Amount`?
+      * *Check:* Is `Due_Date` \> `Invoice_Date`?
+  * **What fails if missing:** The AI might read a "5" as a "6", leading to incorrect financial data entering your database.
+
+-----
+
+## 🔷 PHASE 4: THE CHAT & RETRIEVAL ENGINE
+
+**Goal:** Allow users to chat with the content ("RAG") with high accuracy.
+
+### **STEP 1: LATE CHUNKING**
+
+  * **Model:** **Jina AI Embeddings (v3)**.
+  * **Why it matters:** Standard chunking breaks sentences arbitrarily. Late chunking encodes the *whole* page first to capture context, *then* cuts it up.
+  * **What fails if missing:** The bot answers questions with half-sentences or misses the context of "Who said this?"
+
+### **STEP 2: HYBRID SEARCH (Vector + Keyword)**
+
+  * **Database:** **Qdrant** or **Weaviate**.
+  * **Why it matters:**
+      * *Vector:* Finds concepts ("Why was it rejected?").
+      * *Keyword (BM25):* Finds exact matches ("Find Invoice \#998877").
+  * **What fails if missing:** Users can't search for specific IDs, Names, or Serial Numbers.
+
+### **STEP 3: GRAPHRAG (Deep Reasoning) 🆕**
+
+  * **What it is:** Builds a knowledge graph (Nodes = Entities, Edges = Relationships) from the docs.
+  * **Why it matters:** Enables multi-hop reasoning.
+      * *Query:* "Did the vendor who sold us the Laptops also provide the Service Contract?"
+      * *Action:* Links `Invoice A (Laptops)` -\> `Vendor X` -\> `Contract B (Services)`.
+  * **What fails if missing:** The bot can only answer questions about *one* document at a time, failing at "big picture" queries.
+
+-----
+
+## 🚀 EXECUTION: THE ROUTING LOGIC
+
+Here is the pseudo-code for your "Smart Router" that ties it all together.
+
+```python
+def process_document(file):
+    # --- PHASE 1: DISCOVERY ---
+    if file.is_container: 
+        return Tier0_Unpacker(file)
+    
+    # Generate Dynamic Schema (The "Generic" Magic)
+    schema = Tier0_5_DiscoveryAgent(file.first_page)
+
+    # --- PHASE 2: PROCESSING (Fail-Up Strategy) ---
+    if file.is_digital:
+        markdown = Tier1_Docling(file)
+    elif file.is_structured_form:
+        markdown = Tier3_MistralOCR(file)
+    elif file.is_messy_or_handwritten:
+        markdown = Tier4_VLM(file) # Uses GPT-4o
+    else:
+        # Try Cheap OCR first
+        markdown = Tier2_OCRmyPDF(file)
+        if quality_check(markdown) == "POOR":
+            markdown = Tier4_VLM(file) # Fallback to VLM
+
+    # --- PHASE 3: EXTRACTION ---
+    # Extract data using the discovered schema
+    structured_data = Tier3_SpatialExtractor(markdown, schema)
+    
+    # Run Logic Checks
+    if not Tier3_LogicJudge(structured_data):
+        flag_for_human_review(file)
+
+    # --- PHASE 4: INDEXING ---
+    # Store for Chat
+    VectorDB.upsert(markdown, structured_data)
+    
+    return structured_data
+```
+4.  **GraphRAG:** Added to enable complex, multi-document reasoning in the chat layer.
+
+This outline covers every base, from the simplest PDF to the most complex, unreadable, logic-heavy financial document.
