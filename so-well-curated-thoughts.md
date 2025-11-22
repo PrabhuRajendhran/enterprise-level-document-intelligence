@@ -320,3 +320,47 @@ This video is relevant because it demonstrates the "Auto-Schema" concept in acti
 
 
 http://googleusercontent.com/youtube_content/1
+
+
+I have "saved" the full **Titan-IDP** architecture, the rationale, and the defense strategy into our current context.
+
+If you return to this conversation, I will recall that we have designed a **Universal Intelligent Document Processing (IDP) Engine** with the following immutable core specifications:
+
+### 💾 Context Saved: "Titan-IDP" Specification
+
+* **Architecture Philosophy:** "Fail-Up" / Cost-Funnel (Free $\to$ Cheap $\to$ Smart).
+* **The 4 Tiers:**
+    * **Tier 0:** Unpackers (`libratom`/`unstructured`).
+    * **Tier 1 (Digital):** `Docling`/`MarkItDown` (Code-based extraction).
+    * **Tier 2 (Clean):** `OCRmyPDF` (Standard OCR).
+    * **Tier 3 (Forms):** `Mistral-OCR`/`Surya` (Layout-aware).
+    * **Tier 4 (Complex):** `GPT-4o`/`Qwen2.5-VL` (Visual Reasoning/Handwriting).
+* **The "Generic" Secret:** **Tier 0.5 Discovery Agent** (Auto-generates schemas using VLMs on Page 1).
+* **The Chat Engine:** **Late Chunking** + **Hybrid Search** (Vector + Keyword) + **GraphRAG** (Reasoning).
+* **Defense Logic:**
+    1.  **Speed:** Zero-template setup via Discovery Agent.
+    2.  **Resilience:** Never fails, just escalates tiers.
+    3.  **Cost:** 80% of volume processed for \$0 via Tiers 1 & 2.
+
+---
+
+### 💡 Pro-Tip for Long-Term Memory
+Since I am an AI and sessions can time out or reset depending on the platform you are using, **I highly recommend you copy the text below.**
+
+If you ever start a *new* chat with me (or another AI) and need to resume exactly where we left off, just paste this in:
+
+> **"Restoring Context: Project Titan-IDP"**
+>
+> We are building a tiered IDP system called Titan-IDP.
+> **Goal:** Ingest any file, auto-discover schema, extract data, and chat.
+> **Stack:**
+> 1. **Ingestion:** Tier 0 (Unpackers) -> Tier 0.5 (Auto-Schema Discovery VLM).
+> 2. **Processing:** Tier 1 (Docling) -> Tier 2 (Tesseract) -> Tier 3 (Mistral) -> Tier 4 (GPT-4o/Qwen).
+> 3. **Logic:** "Fail-up" routing based on complexity/confidence.
+> 4. **Chat:** Late Chunking, Qdrant (Hybrid Search), GraphRAG, Cohere Rerank.
+> **Current Status:** Architecture finalized. Defense strategy (Cost/Resilience/Speed) defined.
+> **Next Step:** Implementation of the Tier 0.5 Discovery Agent.
+
+I am ready whenever you want to start writing the code or building the POC!
+
+https://gemini.google.com/share/continue/cf6ac83998e2
