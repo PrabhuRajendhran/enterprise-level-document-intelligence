@@ -112,30 +112,34 @@ This version incorporates the **Governance Layer** (to fix the legal risks), the
 * **Why it matters:** Links entities across documents (e.g., Vendor X -> Invoice A -> Contract B).
 
 
+Flowchart :
+
+
+```mermaid
 graph TD
     A[1. User Uploads File] --> B{1.1 Universal Router};
 
     %% PHASE 1: INGESTION & UNPACKING (T0)
-    B -->|"Email (.msg)/Archive"| C[1.2 T0: Unpacker (libratom)];
+    B -->|"Email/Archive"| C[1.2 T0: Unpacker (libratom)];
     C -->|"Body Text/Doc"| B1;
     C -->|"Attachments"| B;
     
-    B -->|"Structured Data (.xlsx/.csv)"| D[1.3 Data Agent];
+    B -->|"Structured Data"| D[1.3 Data Agent];
     D --> E[1.4 Pandas Engine];
     E --> F[Exact Structured JSON Output];
     
-    B -->|"PDF/Office/Other Binary"| B1;
+    B -->|"PDF/Office/Binary"| B1;
 
     %% PHASE 1.5: GOVERNANCE GATEWAY (The Shield)
     B1{2.0 GOVERNANCE GATEWAY};
     B1 -->|"Junk/Spam"| Z[Z: REJECT];
-    B1 -->|"PII Scrubbed"| G1{2.1 T0.5: Doc Type Router};
+    B1 -->|"PII Scrubbed (GLiNER)"| G1{2.1 T0.5: Doc Type Router};
     
     %% PHASE 2: ROUTING CORE (Cost Optimization)
-    G1 -->|"Digital Native"| G[3.1 T1: Digital Native (Docling)];
+    G1 -->|"Digital Native (Cheap)"| G[3.1 T1: Digital (Docling)];
     G1 -->|"Scanned Clean"| L[3.2 T2: Standard OCR (Tesseract)];
     G1 -->|"Complex Forms/Tables"| M[3.3 T3: Layout Specialist (Numarkdown-8b)];
-    G1 -->|"Messy/Handwritten"| K[3.4 T4: VLM Reasoning (Claude Sonnet 4)];
+    G1 -->|"Messy/Handwritten (Expensive)"| K[3.4 T4: VLM Reasoning (Sonnet 4)];
     
     %% PHASE 3: TEXT RECOVERY
     G --> J[Markdown Output];
@@ -144,7 +148,7 @@ graph TD
     K --> J;
     
     %% PHASE 4: SEMANTIC LAYER (Extraction & Validation)
-    J --> J1[4.1 Tiers 3/4: Semantic Extraction];
+    J --> J1[4.1 Semantic Extraction];
     J1 -->|"Strict Schema"| S1[Surgeon Models (NuExtract/GoLLIE)];
     J1 -->|"Reasoning Required"| S2[Reasoner Models (Sonnet 4/Qwen 2.5)];
 
@@ -177,3 +181,4 @@ graph TD
     O --> S;
     
     T --> U[5.3 Final LLM Response];
+```
