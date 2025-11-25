@@ -1,10 +1,4 @@
-Here is the fully consolidated, production-ready **TITAN-IDP 2.0 (The "Redemption" Architecture)**.
-
-This version incorporates the **Governance Layer** (to fix the legal risks), the **Cost-Routing Logic** (to fix the bankruptcy risks), and the **Tiered Model Strategy** (to fix the operational naivety), formatted exactly as requested.
-
-***
-
-# 🏛️ TITAN-IDP 2.0: Enterprise Document Intelligence Engine
+# 🏛️ TITAN-IDP 1.0: Enterprise Document Intelligence Engine
 **Mission:** Ingest any file, **secure it**, route it intelligently, and extract precise data with **zero-trust validation**.
 
 ---
@@ -112,7 +106,7 @@ This version incorporates the **Governance Layer** (to fix the legal risks), the
 * **Why it matters:** Links entities across documents (e.g., Vendor X -> Invoice A -> Contract B).
 
 
-Flowchart :
+## The Master Architecture Flowchart
 
 ```mermaid
 flowchart TD
