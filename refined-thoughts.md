@@ -116,68 +116,45 @@ Flowchart :
 
 ```mermaid
 graph TD
-A[1. User Uploads File] --> B{1.1 Universal Router};
-
-%% PHASE 1: INGESTION & UNPACKING (T0)
-B -->|"Email/Archive"| C[1.2 T0: Unpacker (libratom)];
-C -->|"Body Text/Doc"| B1;
-C -->|"Attachments"| B;
-
-B -->|"Structured Data"| D[1.3 Data Agent];
-D --> E[1.4 Pandas Engine];
-E --> F[Exact Structured JSON Output];
-
-B -->|"PDF/Office/Binary"| B1;
-
-%% PHASE 1.5: GOVERNANCE GATEWAY (The Shield)
-B1{2.0 GOVERNANCE GATEWAY};
-B1 -->|"Junk/Spam"| Z[Z: REJECT];
-B1 -->|"PII Scrubbed (GLiNER)"| G1{2.1 T0.5: Doc Type Router};
-
-%% PHASE 2: ROUTING CORE (Cost Optimization)
-G1 -->|"Digital Native (Cheap)"| G[3.1 T1: Digital (Docling)];
-G1 -->|"Scanned Clean"| L[3.2 T2: Standard OCR (Tesseract)];
-G1 -->|"Complex Forms/Tables"| M[3.3 T3: Layout Specialist (Numarkdown-8b)];
-G1 -->|"Messy/Handwritten (Expensive)"| K[3.4 T4: VLM Reasoning (Sonnet 4)];
-
-%% PHASE 3: TEXT RECOVERY
-G --> J[Markdown Output];
-L --> J;
-M --> J;
-K --> J;
-
-%% PHASE 4: SEMANTIC LAYER (Extraction & Validation)
-J --> J1[4.1 Semantic Extraction];
-J1 -->|"Strict Schema"| S1[Surgeon Models (NuExtract/GoLLIE)];
-J1 -->|"Reasoning Required"| S2[Reasoner Models (Sonnet 4/Qwen 2.5)];
-
-S1 --> J2{4.2 Confidence Gate};
-S2 --> J2;
-
-J2 -->|"Confidence PASS (>90%)"| DB[(4.4 Structured DB/ERP)];
-J2 -->|"Confidence FAIL (<90%)"| J3[4.3 Human-in-the-Loop UI];
-
-J3 -->|"Validated"| DB;
-F --> DB; 
-
-%% PHASE 5: RAG & CHAT PATH
-
-J --> N[5.1 Late Chunking/Embeddings];
-N --> O[Vector DB];
-
-DB --> R["Metadata Filter"];
-
-User["User Query"] --> P{"5.2 Search Strategy?"};
-P -->|"IDs/Exact Codes"| Q[Hybrid Search (BM25+Vector)];
-P -->|"Field Filter"| R;
-P -->|"Complex Logic"| S[GraphRAG (Multi-hop)];
-
-Q --> T["Reranker"];
-R --> T;
-S --> T;
-
-O --> Q;
-O --> S;
-
-T --> U[5.3 Final LLM Response];
+A[1. User Uploads File] --> B{1.1 Universal Router}
+B -->|"Email/Archive"| C[1.2 T0: Unpacker (libratom)]
+C -->|"Body Text/Doc"| B1
+C -->|"Attachments"| B
+B -->|"Structured Data"| D[1.3 Data Agent]
+D --> E[1.4 Pandas Engine]
+E --> F[Exact Structured JSON Output]
+B -->|"PDF/Office/Binary"| B1
+B1{2.0 GOVERNANCE GATEWAY}
+B1 -->|"Junk/Spam"| Z[Z: REJECT]
+B1 -->|"PII Scrubbed (GLiNER)"| G1{2.1 T0.5: Doc Type Router}
+G1 -->|"Digital Native (Cheap)"| G[3.1 T1: Digital (Docling)]
+G1 -->|"Scanned Clean"| L[3.2 T2: Standard OCR (Tesseract)]
+G1 -->|"Complex Forms/Tables"| M[3.3 T3: Layout Specialist (Numarkdown-8b)]
+G1 -->|"Messy/Handwritten (Expensive)"| K[3.4 T4: VLM Reasoning (Sonnet 4)]
+G --> J[Markdown Output]
+L --> J
+M --> J
+K --> J
+J --> J1[4.1 Semantic Extraction]
+J1 -->|"Strict Schema"| S1[Surgeon Models (NuExtract/GoLLIE)]
+J1 -->|"Reasoning Required"| S2[Reasoner Models (Sonnet 4/Qwen 2.5)]
+S1 --> J2{4.2 Confidence Gate}
+S2 --> J2
+J2 -->|"Confidence PASS (>90%)"| DB[(4.4 Structured DB/ERP)]
+J2 -->|"Confidence FAIL (<90%)"| J3[4.3 Human-in-the-Loop UI]
+J3 -->|"Validated"| DB
+F --> DB
+J --> N[5.1 Late Chunking/Embeddings]
+N --> O[Vector DB]
+DB --> R["Metadata Filter"]
+User["User Query"] --> P{"5.2 Search Strategy?"}
+P -->|"IDs/Exact Codes"| Q[Hybrid Search (BM25+Vector)]
+P -->|"Field Filter"| R
+P -->|"Complex Logic"| S[GraphRAG (Multi-hop)]
+Q --> T["Reranker"]
+R --> T
+S --> T
+O --> Q
+O --> S
+T --> U[5.3 Final LLM Response]
 ```
