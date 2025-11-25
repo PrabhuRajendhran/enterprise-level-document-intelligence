@@ -114,9 +114,7 @@ This version incorporates the **Governance Layer** (to fix the legal risks), the
 
 Flowchart :
 
-
 ```mermaid
-
 graph TD
     A[1. User Uploads File] --> B{1.1 Universal Router};
 
@@ -182,5 +180,3 @@ graph TD
     O --> S;
     
     T --> U[5.3 Final LLM Response];
-
-```
