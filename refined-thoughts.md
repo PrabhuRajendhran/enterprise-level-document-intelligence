@@ -115,46 +115,103 @@ This version incorporates the **Governance Layer** (to fix the legal risks), the
 Flowchart :
 
 ```mermaid
-graph TD
-A[1. User Uploads File] --> B{1.1 Universal Router}
-B -->|"Email/Archive"| C[1.2 T0: Unpacker (libratom)]
-C -->|"Body Text/Doc"| B1
+flowchart TD
+
+%% =========================================================
+%% ENTERPRISE COLOR STYLES
+%% =========================================================
+classDef ingest fill:#e8f1fb,stroke:#1b66c9,stroke-width:1px,color:#000;
+classDef router fill:#fff4d6,stroke:#d29b00,stroke-width:1px,color:#000;
+classDef model fill:#e5f7f3,stroke:#1f8b73,stroke-width:1px,color:#000;
+classDef gateway fill:#fdeaea,stroke:#c44d4d,stroke-width:1px,color:#000;
+classDef db fill:#dce9f7,stroke:#0b3e7e,stroke-width:1px,color:#000;
+classDef output fill:#f2f2f2,stroke:#555,stroke-width:1px,color:#000;
+
+%% =========================================================
+%% SECTION 1 — INGESTION PIPELINE
+%% =========================================================
+subgraph INGEST["📥 ENTERPRISE INGESTION PIPELINE"]
+direction TB
+
+A["1. User Uploads File"]:::ingest --> B{"1.1 Universal Router"}:::router
+
+B -->|"Email / Archive"| C["1.2 T0: Unpacker (libratom)"]:::ingest
+B -->|"PDF / Office / Binary"| B1
+
+C -->|"Body Text / Doc"| B1
 C -->|"Attachments"| B
-B -->|"Structured Data"| D[1.3 Data Agent]
-D --> E[1.4 Pandas Engine]
-E --> F[Exact Structured JSON Output]
-B -->|"PDF/Office/Binary"| B1
-B1{2.0 GOVERNANCE GATEWAY}
-B1 -->|"Junk/Spam"| Z[Z: REJECT]
-B1 -->|"PII Scrubbed (GLiNER)"| G1{2.1 T0.5: Doc Type Router}
-G1 -->|"Digital Native (Cheap)"| G[3.1 T1: Digital (Docling)]
-G1 -->|"Scanned Clean"| L[3.2 T2: Standard OCR (Tesseract)]
-G1 -->|"Complex Forms/Tables"| M[3.3 T3: Layout Specialist (Numarkdown-8b)]
-G1 -->|"Messy/Handwritten (Expensive)"| K[3.4 T4: VLM Reasoning (Sonnet 4)]
-G --> J[Markdown Output]
+
+B -->|"Structured Data"| D["1.3 Data Agent"]:::ingest
+D --> E["1.4 Pandas Engine"]:::ingest
+E --> F["Exact Structured JSON Output"]:::output
+end
+
+%% =========================================================
+%% SECTION 2 — GOVERNANCE & COMPLIANCE
+%% =========================================================
+subgraph GOV["🛡 GOVERNANCE, RISK & COMPLIANCE"]
+direction TB
+
+B1{"2.0 Governance Gateway"}:::gateway
+B1 -->|"Junk / Spam"| Z["Z: REJECT"]:::output
+B1 -->|"PII Scrubbed (GLiNER)"| G1{"2.1 Doc Type Router"}:::router
+
+G1 -->|"Digital Native"| G["3.1 T1: Docling"]:::model
+G1 -->|"Scanned Clean"| L["3.2 T2: OCR (Tesseract)"]:::model
+G1 -->|"Complex Forms / Tables"| M["3.3 T3: Layout Specialist"]:::model
+G1 -->|"Messy / Handwritten"| K["3.4 T4: VLM Reasoning"]:::model
+end
+
+%% =========================================================
+%% SECTION 3 — SEMANTIC EXTRACTION ENGINE
+%% =========================================================
+subgraph EXTRACT["🧠 ENTERPRISE SEMANTIC EXTRACTION"]
+direction TB
+
+G --> J["Markdown Output"]:::output
 L --> J
 M --> J
 K --> J
-J --> J1[4.1 Semantic Extraction]
-J1 -->|"Strict Schema"| S1[Surgeon Models (NuExtract/GoLLIE)]
-J1 -->|"Reasoning Required"| S2[Reasoner Models (Sonnet 4/Qwen 2.5)]
-S1 --> J2{4.2 Confidence Gate}
+
+J --> J1["4.1 Semantic Extractor"]:::model
+
+J1 -->|"Strict Schema"| S1["Surgeon Models (NuExtract / GoLLIE)"]:::model
+J1 -->|"Reasoning Required"| S2["Reasoner Models (Sonnet4 / Qwen)"]:::model
+
+S1 --> J2{"4.2 Confidence Gate"}:::gateway
 S2 --> J2
-J2 -->|"Confidence PASS (>90%)"| DB[(4.4 Structured DB/ERP)]
-J2 -->|"Confidence FAIL (<90%)"| J3[4.3 Human-in-the-Loop UI]
+
+J2 -->|"PASS > 90%"| DB["4.4 Structured DB / ERP"]:::db
+J2 -->|"FAIL < 90%"| J3["4.3 Human Review UI"]:::output
 J3 -->|"Validated"| DB
+
 F --> DB
-J --> N[5.1 Late Chunking/Embeddings]
-N --> O[Vector DB]
-DB --> R["Metadata Filter"]
-User["User Query"] --> P{"5.2 Search Strategy?"}
-P -->|"IDs/Exact Codes"| Q[Hybrid Search (BM25+Vector)]
+end
+
+%% =========================================================
+%% SECTION 4 — SEARCH + RAG STRATEGY
+%% =========================================================
+subgraph RAG["🔎 SEARCH & RETRIEVAL (RAG)"]
+direction TB
+
+DB --> R["Metadata Filter"]:::ingest
+
+User["User Query"]:::ingest --> P{"5.2 Search Strategy"}:::router
+
+P -->|"IDs / Exact Codes"| Q["Hybrid Search (BM25 + Vector)"]:::ingest
 P -->|"Field Filter"| R
-P -->|"Complex Logic"| S[GraphRAG (Multi-hop)]
-Q --> T["Reranker"]
-R --> T
-S --> T
+P -->|"Complex Logic"| S["GraphRAG (Multi-hop)"]:::model
+
+N["5.1 Embeddings / Chunking"]:::model --> O["Vector DB"]:::db
+J --> N
+
 O --> Q
 O --> S
-T --> U[5.3 Final LLM Response]
+
+Q --> T["Reranker"]:::model
+R --> T
+S --> T
+
+T --> U["5.3 Final LLM Response"]:::output
+end
 ```
